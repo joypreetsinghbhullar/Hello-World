@@ -39,3 +39,9 @@ age = 2024 - int(birth_year)
 print(type(age))
 print (age)
 
+# Askes the user their weight (in pounds), and converts it into kilograms and print it in the terminal
+
+weight_lbs = input("Weight (lbs): ")
+weight_kg = int(weight_lbs) * 0.45
+print (weight_kg)
+

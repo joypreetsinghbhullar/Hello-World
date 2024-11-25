@@ -26,3 +26,16 @@ print ("Hi " + input_name)
 user_input_name = input ("What is your name? ")
 favorite_color = input ("What is your favorite color? ")
 print (user_input_name + " likes " + favorite_color)
+
+# Ask the year we were born and calculate our age we were born in 
+# Key notes
+# int() converts value into an integer
+# float() converts the value into a float/decimal
+# bool() converts string to a boolean value
+
+birth_year = input ("Birth year: ")
+print(type(birth_year))
+age = 2024 - int(birth_year)
+print(type(age))
+print (age)
+

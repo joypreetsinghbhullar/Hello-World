@@ -288,3 +288,12 @@ else:
 
 
 
+absolute_value = input(int(  ))
+print (abs(absolute_value))
+
+def all(iterable):
+    for element in iterable:
+        if not element:
+            return False
+    return True 
+

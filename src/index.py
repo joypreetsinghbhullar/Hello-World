@@ -33,17 +33,17 @@ print (user_input_name + " likes " + favorite_color)
 # float() converts the value into a float/decimal
 # bool() converts string to a boolean value
 
-birth_year = input ("Birth year: ")
-print(type(birth_year))
-age = 2024 - int(birth_year)
-print(type(age))
-print (age)
+#birth_year = input ("Birth year: ")
+#print(type(birth_year))
+#age = 2024 - int(birth_year)
+#print(type(age))
+#print (age)
 
 # Askes the user their weight (in pounds), and converts it into kilograms and print it in the terminal
 
-weight_lbs = input("Weight (lbs): ")
-weight_kg = int(weight_lbs) * 0.45
-print (weight_kg)
+#weight_lbs = input("Weight (lbs): ")
+#weight_kg = int(weight_lbs) * 0.45
+#print (weight_kg)
 
 # Python course for beginners 
 # Key note that you need double quotes to put a aposterphe in a string 
@@ -227,33 +227,7 @@ elif len(name) > 50:
 else:
     print("Name looks good")
 
-# Project: Weight Converter 
 
-weight = int(input("Weight: ")) #int converts from a string to a integer 
-unit = input('(L)bs or (K)g')
-if unit.upper() == "L":
-   converted = weight * 0.45
-   print (f"You are {converted} kilos")
-else:
-    converted = weight / 0.45
-    print(f"You are {converted} pounds")
-
-# Weight converter: Which works now # WARNING: AI GENERATED
-
-weight = int(input("Weight: "))  # int converts from string to an integer
-unit = input('(L)bs or (K)g: ')
-
-if unit.upper() == "L":
-    converted = weight * 0.45
-    print(f"You are {converted} kilos.")
-elif unit.upper() == "K":
-    converted = weight / 0.45
-    print(f"You are {converted} pounds.")
-else:
-    print("Invalid input. Please enter 'L' for pounds or 'K' for kilograms.")
-
-
-# While Loops
 
 i = 1
 while 1 <= 5:
@@ -269,6 +243,33 @@ while 1 <= 5:
     i = i + 1
 print("Done")
 
+# Project: Weight Converter 
+
+#weight = int(input("Weight: ")) #int converts from a string to a integer 
+#unit = input('(L)bs or (K)g')
+#if unit.upper() == "L":
+#   converted = weight * 0.45
+#   print (f"You are {converted} kilos")
+#else:
+#    converted = weight / 0.45
+#    print(f"You are {converted} pounds")
+
+# Weight converter: Which works now # WARNING: AI GENERATED
+
+#weight = int(input("Weight: "))  # int converts from string to an integer
+#unit = input('(L)bs or (K)g: ')
+
+#if unit.upper() == "L":
+    #converted = weight * 0.45
+    #print(f"You are {converted} kilos.")
+#elif unit.upper() == "K":
+    #converted = weight / 0.45
+    #print(f"You are {converted} pounds.")
+#else:
+#    print("Invalid input. Please enter 'L' for pounds or 'K' for kilograms.")
+
+
+# While Loops
 # Building a guessing game
 
 secret_number = 9
@@ -284,16 +285,12 @@ else:
    print('Sorry you failed') 
 
 # Car Game 
+command = ""
+while command.lower() != "quit": 
+        command = input ("> ")
+        if command.lower() == "start":
+            print("Car starter....")
+        elif command.lower() == "stop":
+            print("Car stopped.")
 
-
-
-
-absolute_value = input(int(  ))
-print (abs(absolute_value))
-
-def all(iterable):
-    for element in iterable:
-        if not element:
-            return False
-    return True 
-
+# Car game without repetion

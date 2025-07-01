@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>GPA Calculator</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk&display=swap" rel="stylesheet" />
@@ -14,7 +14,6 @@
       margin: 0;
       padding: 2rem;
     }
-
     .glass {
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(10px);
@@ -23,63 +22,87 @@
       margin-bottom: 1rem;
       box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
     }
-
     .input-group {
       display: flex;
       gap: 0.5rem;
       margin-bottom: 0.5rem;
+      align-items: center;
     }
-
-    input {
+    input[type=number], input[type=text] {
       padding: 0.4rem;
       border: none;
       border-radius: 0.5rem;
       width: 100%;
+      box-sizing: border-box;
     }
-
     button {
-      padding: 0.6rem 1rem;
+      padding: 0.4rem 0.75rem;
       background-color: #FFCD00;
       color: #202A44;
       border: none;
       border-radius: 0.5rem;
       cursor: pointer;
       font-weight: bold;
+      transition: background 0.3s;
     }
-
+    button:hover {
+      background-color: #e6b800;
+    }
     .center {
       text-align: center;
     }
-
     canvas {
       background: #ffffff0a;
       border-radius: 1rem;
       padding: 1rem;
+      max-width: 100%;
     }
-
     .key-table {
       margin: 1rem auto;
       border-collapse: collapse;
       background: rgba(255,255,255,0.08);
       border-radius: 1rem;
       overflow: hidden;
+      max-width: 500px;
     }
-
     .key-table th, .key-table td {
       padding: 0.5rem 1rem;
       border: 1px solid rgba(255,255,255,0.1);
       text-align: center;
     }
-
     .highlight {
       background-color: #FFCD00;
       color: #202A44;
       font-weight: bold;
     }
-
     .tiny {
       font-size: 0.9rem;
       color: #ccc;
+    }
+    .btn-delete {
+      background-color: #ff4d4d;
+      color: white;
+      padding: 0.2rem 0.5rem;
+      font-weight: normal;
+      font-size: 0.9rem;
+      border-radius: 0.3rem;
+      cursor: pointer;
+      border: none;
+      margin-left: 0.3rem;
+      transition: background 0.2s;
+    }
+    .btn-delete:hover {
+      background-color: #e04343;
+    }
+    .subject-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    .assessment-label {
+      width: 50px;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -105,14 +128,13 @@
 <script>
   const subjects = [];
   const allowedDecimals = [0.00, 0.14, 0.29, 0.43, 0.57, 0.71, 0.84];
+  let gpaChart = null;
 
   function roundToGPAConstant(value) {
     const intPart = Math.floor(value);
     const decimal = value - intPart;
-
     let closest = allowedDecimals[0];
     let minDiff = Math.abs(decimal - closest);
-
     for (let i = 1; i < allowedDecimals.length; i++) {
       const diff = Math.abs(decimal - allowedDecimals[i]);
       if (diff < minDiff) {
@@ -120,7 +142,6 @@
         closest = allowedDecimals[i];
       }
     }
-
     return parseFloat((intPart + closest).toFixed(2));
   }
 
@@ -152,35 +173,140 @@
   function addSubject() {
     const index = subjects.length;
     subjects.push({ name: '', assessments: [] });
+    renderSubjects();
+  }
 
-    const container = document.getElementById('subjectsContainer');
-    const card = document.createElement('div');
-    card.className = 'glass';
-    card.innerHTML = `
-      <input placeholder="Subject name" onchange="subjects[${index}].name = this.value" />
-      <div id="assessments-${index}"></div>
-      <button onclick="addAssessment(${index})">+ Add Assessment</button>
-    `;
-    container.appendChild(card);
+  function removeSubject(index) {
+    subjects.splice(index,1);
+    renderSubjects();
   }
 
   function addAssessment(subjectIndex) {
     subjects[subjectIndex].assessments.push({ score: 0, outOf: 100, weight: 1 });
-    renderAssessments(subjectIndex);
+    renderSubjects();
   }
 
-  function renderAssessments(subjectIndex) {
-    const container = document.getElementById(`assessments-${subjectIndex}`);
+  function removeAssessment(subjectIndex, assessmentIndex) {
+    subjects[subjectIndex].assessments.splice(assessmentIndex,1);
+    renderSubjects();
+  }
+
+  function renderSubjects() {
+    const container = document.getElementById('subjectsContainer');
     container.innerHTML = '';
-    subjects[subjectIndex].assessments.forEach((a, aIdx) => {
-      container.innerHTML += `
-        <div class="input-group">
-          <input type="number" placeholder="Score" oninput="subjects[${subjectIndex}].assessments[${aIdx}].score = parseFloat(this.value)" />
-          <input type="number" placeholder="Out Of" oninput="subjects[${subjectIndex}].assessments[${aIdx}].outOf = parseFloat(this.value)" />
-          <input type="number" placeholder="Weight" value="1" oninput="subjects[${subjectIndex}].assessments[${aIdx}].weight = parseFloat(this.value)" />
-        </div>
-      `;
+
+    subjects.forEach((sub, subIndex) => {
+      const card = document.createElement('div');
+      card.className = 'glass';
+
+      // Subject header with delete
+      const subjectHeader = document.createElement('div');
+      subjectHeader.className = 'subject-header';
+
+      const subjectInput = document.createElement('input');
+      subjectInput.type = 'text';
+      subjectInput.placeholder = 'Subject name';
+      subjectInput.value = sub.name;
+      subjectInput.oninput = e => {
+        sub.name = e.target.value;
+        updateGPA();
+      };
+
+      const deleteSubBtn = document.createElement('button');
+      deleteSubBtn.textContent = 'Delete Subject';
+      deleteSubBtn.className = 'btn-delete';
+      deleteSubBtn.onclick = () => {
+        removeSubject(subIndex);
+      };
+
+      subjectHeader.appendChild(subjectInput);
+      subjectHeader.appendChild(deleteSubBtn);
+
+      card.appendChild(subjectHeader);
+
+      // Assessments container
+      const assessmentsContainer = document.createElement('div');
+      assessmentsContainer.id = `assessments-${subIndex}`;
+
+      // Assessment labels row
+      const labelRow = document.createElement('div');
+      labelRow.className = 'input-group';
+      ['Score', 'Out Of', 'Weight', ''].forEach(label => {
+        const lbl = document.createElement('div');
+        lbl.textContent = label;
+        lbl.style.fontWeight = 'bold';
+        lbl.style.width = label === '' ? 'auto' : '80px';
+        labelRow.appendChild(lbl);
+      });
+      assessmentsContainer.appendChild(labelRow);
+
+      // Render assessments
+      sub.assessments.forEach((a, aIdx) => {
+        const inputGroup = document.createElement('div');
+        inputGroup.className = 'input-group';
+
+        const scoreInput = document.createElement('input');
+        scoreInput.type = 'number';
+        scoreInput.min = '0';
+        scoreInput.placeholder = 'Score';
+        scoreInput.value = a.score;
+        scoreInput.oninput = e => {
+          a.score = parseFloat(e.target.value) || 0;
+          updateGPA();
+        };
+
+        const outOfInput = document.createElement('input');
+        outOfInput.type = 'number';
+        outOfInput.min = '1';
+        outOfInput.placeholder = 'Out Of';
+        outOfInput.value = a.outOf;
+        outOfInput.oninput = e => {
+          let val = parseFloat(e.target.value);
+          if (val < 1 || isNaN(val)) val = 1;
+          a.outOf = val;
+          outOfInput.value = val; // enforce min
+          updateGPA();
+        };
+
+        const weightInput = document.createElement('input');
+        weightInput.type = 'number';
+        weightInput.min = '0';
+        weightInput.step = '0.01';
+        weightInput.placeholder = 'Weight';
+        weightInput.value = a.weight;
+        weightInput.oninput = e => {
+          a.weight = parseFloat(e.target.value) || 1;
+          updateGPA();
+        };
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'X';
+        deleteBtn.className = 'btn-delete';
+        deleteBtn.title = 'Delete Assessment';
+        deleteBtn.onclick = () => {
+          removeAssessment(subIndex, aIdx);
+        };
+
+        inputGroup.appendChild(scoreInput);
+        inputGroup.appendChild(outOfInput);
+        inputGroup.appendChild(weightInput);
+        inputGroup.appendChild(deleteBtn);
+
+        assessmentsContainer.appendChild(inputGroup);
+      });
+
+      // Add Assessment button
+      const addAssessBtn = document.createElement('button');
+      addAssessBtn.textContent = '+ Add Assessment';
+      addAssessBtn.onclick = () => addAssessment(subIndex);
+      addAssessBtn.style.marginTop = '0.5rem';
+
+      card.appendChild(assessmentsContainer);
+      card.appendChild(addAssessBtn);
+
+      container.appendChild(card);
     });
+
     updateGPA();
   }
 
@@ -193,7 +319,7 @@
       let weightSum = 0;
 
       sub.assessments.forEach(a => {
-        const percent = (a.score / a.outOf) * 100;
+        const percent = a.outOf > 0 ? (a.score / a.outOf) * 100 : 0;
         const gpa = percentageToGPA(percent);
         weightedTotal += gpa * a.weight;
         weightSum += a.weight;
@@ -213,20 +339,33 @@
 
     document.getElementById('motivational').textContent = rounded < 13 ? "You're more than a number 💙" : '';
 
-    const chart = Chart.getChart("gpaChart");
-    if (chart) chart.destroy();
-
-    new Chart(document.getElementById("gpaChart"), {
-      type: "bar",
-      data: {
-        labels: subjects.map(s => s.name || "Unnamed"),
-        datasets: [{
-          label: "Subject GPA",
-          data: subjectGPAs,
-          backgroundColor: "#FFCD00"
-        }]
-      }
-    });
+    if (!gpaChart) {
+      gpaChart = new Chart(document.getElementById("gpaChart"), {
+        type: "bar",
+        data: {
+          labels: subjects.map(s => s.name || "Unnamed"),
+          datasets: [{
+            label: "Subject GPA",
+            data: subjectGPAs,
+            backgroundColor: "#FFCD00"
+          }]
+        },
+        options: {
+          animation: false,
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 15
+            }
+          }
+        }
+      });
+    } else {
+      gpaChart.data.labels = subjects.map(s => s.name || "Unnamed");
+      gpaChart.data.datasets[0].data = subjectGPAs;
+      gpaChart.update('none'); // update without animation to avoid page jump
+    }
 
     drawKeyRow(raw);
   }
@@ -245,7 +384,8 @@
     });
   }
 
-  setInterval(updateGPA, 1000);
+  // Start with one subject by default
+  addSubject();
 </script>
 
 </body>

@@ -171,13 +171,12 @@
   }
 
   function addSubject() {
-    const index = subjects.length;
     subjects.push({ name: '', assessments: [] });
     renderSubjects();
   }
 
   function removeSubject(index) {
-    subjects.splice(index,1);
+    subjects.splice(index, 1);
     renderSubjects();
   }
 
@@ -187,7 +186,7 @@
   }
 
   function removeAssessment(subjectIndex, assessmentIndex) {
-    subjects[subjectIndex].assessments.splice(assessmentIndex,1);
+    subjects[subjectIndex].assessments.splice(assessmentIndex, 1);
     renderSubjects();
   }
 
@@ -261,11 +260,22 @@
         outOfInput.placeholder = 'Out Of';
         outOfInput.value = a.outOf;
         outOfInput.oninput = e => {
-          let val = parseFloat(e.target.value);
-          if (val < 1 || isNaN(val)) val = 1;
-          a.outOf = val;
-          outOfInput.value = val; // enforce min
+          const val = e.target.value;
+          // allow empty string to let user clear the field
+          if (val === '') {
+            a.outOf = val; // temporarily empty
+          } else {
+            const num = parseFloat(val);
+            a.outOf = isNaN(num) ? '' : num;
+          }
           updateGPA();
+        };
+        outOfInput.onblur = e => {
+          if (e.target.value === '' || parseFloat(e.target.value) < 1) {
+            a.outOf = 1;
+            e.target.value = '1';
+            updateGPA();
+          }
         };
 
         const weightInput = document.createElement('input');
@@ -319,7 +329,8 @@
       let weightSum = 0;
 
       sub.assessments.forEach(a => {
-        const percent = a.outOf > 0 ? (a.score / a.outOf) * 100 : 0;
+        const outOfNum = parseFloat(a.outOf);
+        const percent = outOfNum > 0 ? (a.score / outOfNum) * 100 : 0;
         const gpa = percentageToGPA(percent);
         weightedTotal += gpa * a.weight;
         weightSum += a.weight;
